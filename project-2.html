@@ -132,6 +132,12 @@
         </div>
     </footer>
 
+    <!-- 访问验证检查 -->
+    <script>
+        if (sessionStorage.getItem('portfolioAccess') !== 'granted') {
+            window.location.href = 'login.html';
+        }
+    </script>
     <script src="script.js"></script>
 </body>
 </html>

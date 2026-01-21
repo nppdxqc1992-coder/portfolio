@@ -337,6 +337,14 @@
         </div>
     </footer>
 
+    <!-- 访问验证检查 -->
+    <script>
+        // 检查是否已通过密码验证
+        if (sessionStorage.getItem('portfolioAccess') !== 'granted') {
+            // 未验证，跳转到登录页面
+            window.location.href = 'login.html';
+        }
+    </script>
     <script src="script.js"></script>
 </body>
 </html>

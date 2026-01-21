@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 - 个人简历</title>
+    <style>
+        /* 重置样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 页面主体 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f7;
+            min-height: 100vh;
+            color: #1d1d1f;
+        }
+
+        /* 导航栏 */
+        .admin-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .admin-nav h1 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            background: transparent;
+            color: #1d1d1f;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        /* 主容器 */
+        .admin-container {
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        /* 卡片样式 */
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: #86868b;
+            margin-bottom: 24px;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #1d1d1f;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 16px;
+            border: 1px solid #d2d2d7;
+            border-radius: 10px;
+            background: #fff;
+            color: #1d1d1f;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: #0071e3;
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+        }
+
+        /* 按钮样式 */
+        .btn-primary {
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            border-radius: 10px;
+            background: #0071e3;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #0077ed;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 消息提示 */
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .message.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            display: block;
+        }
+
+        .message.error {
+            background: #ffebee;
+            color: #c62828;
+            display: block;
+        }
+
+        /* 登录表单（未登录时显示） */
+        .login-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #000;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            color: #fff;
+        }
+
+        .login-card .card-title {
+            color: #fff;
+            text-align: center;
+        }
+
+        .login-card .card-desc {
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+        }
+
+        .login-card .form-input {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .login-card .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .login-card .form-input:focus {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .login-card .form-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .login-card .btn-primary {
+            background: #fff;
+            color: #000;
+        }
+
+        .login-card .btn-primary:hover {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .back-link a:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* 隐藏类 */
+        .hidden {
+            display: none !important;
+        }
+
+        /* 当前密码显示 */
+        .current-password {
+            background: #f5f5f7;
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+        }
+
+        .current-password-label {
+            font-size: 12px;
+            color: #86868b;
+            margin-bottom: 4px;
+        }
+
+        .current-password-value {
+            font-size: 18px;
+            font-weight: 500;
+            font-family: monospace;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录界面（未登录时显示） -->
+    <div id="loginSection" class="login-section">
+        <div class="login-card">
+            <h2 class="card-title">管理员登录</h2>
+            <p class="card-desc">请使用管理员账号登录</p>
+
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label class="form-label">邮箱</label>
+                    <input type="email" id="adminEmail" class="form-input" placeholder="admin@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">密码</label>
+                    <input type="password" id="adminPassword" class="form-input" placeholder="管理员密码" required>
+                </div>
+                <button type="submit" class="btn-primary" id="loginBtn">登录</button>
+                <div id="loginMessage" class="message"></div>
+            </form>
+
+            <div class="back-link">
+                <a href="login.html">← 返回访客入口</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理界面（登录后显示） -->
+    <div id="adminSection" class="hidden">
+        <nav class="admin-nav">
+            <h1>作品集管理后台</h1>
+            <button class="logout-btn" id="logoutBtn">退出登录</button>
+        </nav>
+
+        <div class="admin-container">
+            <!-- 修改访问密码 -->
+            <div class="card">
+                <h3 class="card-title">访问密码设置</h3>
+                <p class="card-desc">设置访客查看作品集时需要输入的密码</p>
+
+                <div class="current-password" id="currentPasswordSection">
+                    <div class="current-password-label">当前密码</div>
+                    <div class="current-password-value" id="currentPassword">加载中...</div>
+                </div>
+
+                <form id="passwordForm">
+                    <div class="form-group">
+                        <label class="form-label">新访问密码</label>
+                        <input type="text" id="newPassword" class="form-input" placeholder="输入新密码" required minlength="4">
+                    </div>
+                    <button type="submit" class="btn-primary" id="saveBtn">保存密码</button>
+                    <div id="passwordMessage" class="message"></div>
+                </form>
+            </div>
+
+            <!-- 使用说明 -->
+            <div class="card">
+                <h3 class="card-title">使用说明</h3>
+                <p class="card-desc" style="margin-bottom: 0; line-height: 1.8;">
+                    1. 在上方设置访客访问密码<br>
+                    2. 访客打开网站时会看到密码输入页面<br>
+                    3. 输入正确密码后才能查看作品集<br>
+                    4. 你可以随时在这里修改密码
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db, signInWithEmailAndPassword, onAuthStateChanged, signOut, doc, getDoc, setDoc } from './firebase-config.js';
+
+        // DOM 元素
+        const loginSection = document.getElementById('loginSection');
+        const adminSection = document.getElementById('adminSection');
+        const adminLoginForm = document.getElementById('adminLoginForm');
+        const passwordForm = document.getElementById('passwordForm');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginMessage = document.getElementById('loginMessage');
+        const passwordMessage = document.getElementById('passwordMessage');
+        const currentPassword = document.getElementById('currentPassword');
+
+        // 监听登录状态
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // 已登录，显示管理界面
+                loginSection.classList.add('hidden');
+                adminSection.classList.remove('hidden');
+                loadCurrentPassword();
+            } else {
+                // 未登录，显示登录界面
+                loginSection.classList.remove('hidden');
+                adminSection.classList.add('hidden');
+            }
+        });
+
+        // 管理员登录
+        adminLoginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            const loginBtn = document.getElementById('loginBtn');
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = '登录中...';
+            loginMessage.className = 'message';
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // 登录成功，onAuthStateChanged 会自动处理界面切换
+            } catch (error) {
+                console.error('登录失败:', error);
+                loginMessage.textContent = '登录失败：邮箱或密码错误';
+                loginMessage.className = 'message error';
+            }
+
+            loginBtn.disabled = false;
+            loginBtn.textContent = '登录';
+        });
+
+        // 退出登录
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+            } catch (error) {
+                console.error('退出失败:', error);
+            }
+        });
+
+        // 加载当前密码
+        async function loadCurrentPassword() {
+            try {
+                const docRef = doc(db, 'settings', 'access');
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    currentPassword.textContent = docSnap.data().password;
+                } else {
+                    currentPassword.textContent = '未设置';
+                }
+            } catch (error) {
+                console.error('加载密码失败:', error);
+                currentPassword.textContent = '加载失败';
+            }
+        }
+
+        // 保存新密码
+        passwordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const newPass = document.getElementById('newPassword').value.trim();
+            const saveBtn = document.getElementById('saveBtn');
+
+            if (!newPass) return;
+
+            saveBtn.disabled = true;
+            saveBtn.textContent = '保存中...';
+            passwordMessage.className = 'message';
+
+            try {
+                const docRef = doc(db, 'settings', 'access');
+                await setDoc(docRef, { password: newPass });
+
+                passwordMessage.textContent = '密码已更新成功！';
+                passwordMessage.className = 'message success';
+                currentPassword.textContent = newPass;
+                document.getElementById('newPassword').value = '';
+            } catch (error) {
+                console.error('保存失败:', error);
+                passwordMessage.textContent = '保存失败，请重试';
+                passwordMessage.className = 'message error';
+            }
+
+            saveBtn.disabled = false;
+            saveBtn.textContent = '保存密码';
+        });
+    </script>
+</body>
+</html>
