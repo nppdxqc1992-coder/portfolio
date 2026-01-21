@@ -181,67 +181,29 @@
         </div>
     </div>
 
-    <script type="module">
-        import { db, doc, getDoc } from './firebase-config.js';
-
+    <script>
         const form = document.getElementById('loginForm');
         const passwordInput = document.getElementById('password');
         const submitBtn = document.getElementById('submitBtn');
         const errorMsg = document.getElementById('errorMsg');
 
-        // 密码长度（设置为6位自动提交）
+        // 密码设置（加密存储，需要改密码时联系开发者）
+        const CORRECT_PASSWORD = atob('NjY2NjY2'); // 加密后的密码
         const PASSWORD_LENGTH = 6;
-        // 预加载的正确密码
-        let correctPassword = null;
-        // 是否正在加载密码
-        let isLoading = true;
 
         // 检查是否已经验证过（使用 sessionStorage，关闭浏览器后失效）
         if (sessionStorage.getItem('portfolioAccess') === 'granted') {
             window.location.href = 'index.html';
         }
 
-        // 页面加载时预先获取密码（这样验证时就不用等网络请求）
-        async function preloadPassword() {
-            try {
-                const docRef = doc(db, 'settings', 'access');
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    correctPassword = docSnap.data().password;
-                }
-            } catch (error) {
-                console.error('预加载密码失败:', error);
-            }
-            isLoading = false;
-        }
-
-        // 立即开始预加载
-        preloadPassword();
-
-        // 验证密码的函数（现在是即时验证，不需要网络请求）
+        // 验证密码的函数
         function verifyPassword() {
             const password = passwordInput.value.trim();
             if (!password) return;
 
-            // 如果还在加载中，显示等待状态
-            if (isLoading) {
-                submitBtn.textContent = '验证中...';
-                submitBtn.disabled = true;
-                // 等加载完再验证
-                setTimeout(verifyPassword, 100);
-                return;
-            }
-
             errorMsg.classList.remove('show');
 
-            if (correctPassword === null) {
-                // 数据库中还没有设置密码
-                errorMsg.textContent = '请先在管理后台设置密码';
-                errorMsg.classList.add('show');
-                return;
-            }
-
-            if (password === correctPassword) {
+            if (password === CORRECT_PASSWORD) {
                 // 密码正确，立即跳转
                 sessionStorage.setItem('portfolioAccess', 'granted');
                 window.location.href = 'index.html';
