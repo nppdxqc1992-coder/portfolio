@@ -495,11 +495,14 @@ body {
     display: block;
     text-decoration: none;
     cursor: pointer;
-    transition: transform 0.4s ease;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    border-radius: 16px;
+    padding-bottom: 16px;
 }
 
 .project-card:hover {
     transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
 a.project-card {
@@ -538,6 +541,33 @@ a.project-card .project-desc {
     color: var(--gray);
     font-size: 0.9rem;
     transition: transform 0.4s ease;
+    position: relative;
+}
+
+/* 悬停时显示"查看详情"遮罩 */
+.project-image .image-placeholder::before {
+    content: '查看项目 →';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 16px;
+    z-index: 2;
+}
+
+.project-card:hover .image-placeholder::before {
+    opacity: 1;
 }
 
 .project-card:hover .image-placeholder {
