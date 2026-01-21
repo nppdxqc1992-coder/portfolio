@@ -189,17 +189,24 @@
         const submitBtn = document.getElementById('submitBtn');
         const errorMsg = document.getElementById('errorMsg');
 
+        // 密码长度（设置为6位自动提交）
+        const PASSWORD_LENGTH = 6;
+        // 防止重复提交
+        let isVerifying = false;
+
         // 检查是否已经验证过（使用 sessionStorage，关闭浏览器后失效）
         if (sessionStorage.getItem('portfolioAccess') === 'granted') {
             window.location.href = 'index.html';
         }
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // 验证密码的函数
+        async function verifyPassword() {
+            if (isVerifying) return;
 
             const password = passwordInput.value.trim();
             if (!password) return;
 
+            isVerifying = true;
             // 显示加载状态
             submitBtn.textContent = '验证中...';
             submitBtn.disabled = true;
@@ -237,6 +244,22 @@
             // 恢复按钮状态
             submitBtn.textContent = '进入作品集';
             submitBtn.disabled = false;
+            isVerifying = false;
+        }
+
+        // 监听输入，当输入达到6位时自动验证
+        passwordInput.addEventListener('input', (e) => {
+            const password = e.target.value;
+            // 当输入达到指定长度时，自动提交验证
+            if (password.length >= PASSWORD_LENGTH) {
+                verifyPassword();
+            }
+        });
+
+        // 保留表单提交功能（用户也可以手动点击按钮）
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            verifyPassword();
         });
     </script>
 </body>
