@@ -191,60 +191,67 @@
 
         // 密码长度（设置为6位自动提交）
         const PASSWORD_LENGTH = 6;
-        // 防止重复提交
-        let isVerifying = false;
+        // 预加载的正确密码
+        let correctPassword = null;
+        // 是否正在加载密码
+        let isLoading = true;
 
         // 检查是否已经验证过（使用 sessionStorage，关闭浏览器后失效）
         if (sessionStorage.getItem('portfolioAccess') === 'granted') {
             window.location.href = 'index.html';
         }
 
-        // 验证密码的函数
-        async function verifyPassword() {
-            if (isVerifying) return;
+        // 页面加载时预先获取密码（这样验证时就不用等网络请求）
+        async function preloadPassword() {
+            try {
+                const docRef = doc(db, 'settings', 'access');
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    correctPassword = docSnap.data().password;
+                }
+            } catch (error) {
+                console.error('预加载密码失败:', error);
+            }
+            isLoading = false;
+        }
 
+        // 立即开始预加载
+        preloadPassword();
+
+        // 验证密码的函数（现在是即时验证，不需要网络请求）
+        function verifyPassword() {
             const password = passwordInput.value.trim();
             if (!password) return;
 
-            isVerifying = true;
-            // 显示加载状态
-            submitBtn.textContent = '验证中...';
-            submitBtn.disabled = true;
-            errorMsg.classList.remove('show');
-
-            try {
-                // 从 Firestore 获取密码
-                const docRef = doc(db, 'settings', 'access');
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-                    const correctPassword = docSnap.data().password;
-
-                    if (password === correctPassword) {
-                        // 密码正确，保存验证状态并跳转
-                        sessionStorage.setItem('portfolioAccess', 'granted');
-                        window.location.href = 'index.html';
-                    } else {
-                        // 密码错误
-                        errorMsg.classList.add('show');
-                        passwordInput.value = '';
-                        passwordInput.focus();
-                    }
-                } else {
-                    // 数据库中还没有设置密码，显示提示
-                    errorMsg.textContent = '请先在管理后台设置密码';
-                    errorMsg.classList.add('show');
-                }
-            } catch (error) {
-                console.error('验证失败:', error);
-                errorMsg.textContent = '验证失败，请稍后重试';
-                errorMsg.classList.add('show');
+            // 如果还在加载中，显示等待状态
+            if (isLoading) {
+                submitBtn.textContent = '验证中...';
+                submitBtn.disabled = true;
+                // 等加载完再验证
+                setTimeout(verifyPassword, 100);
+                return;
             }
 
-            // 恢复按钮状态
-            submitBtn.textContent = '进入作品集';
-            submitBtn.disabled = false;
-            isVerifying = false;
+            errorMsg.classList.remove('show');
+
+            if (correctPassword === null) {
+                // 数据库中还没有设置密码
+                errorMsg.textContent = '请先在管理后台设置密码';
+                errorMsg.classList.add('show');
+                return;
+            }
+
+            if (password === correctPassword) {
+                // 密码正确，立即跳转
+                sessionStorage.setItem('portfolioAccess', 'granted');
+                window.location.href = 'index.html';
+            } else {
+                // 密码错误
+                errorMsg.textContent = '密码错误，请重试';
+                errorMsg.classList.add('show');
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
         }
 
         // 监听输入，当输入达到6位时自动验证
@@ -257,7 +264,7 @@
         });
 
         // 保留表单提交功能（用户也可以手动点击按钮）
-        form.addEventListener('submit', async (e) => {
+        form.addEventListener('submit', (e) => {
             e.preventDefault();
             verifyPassword();
         });
