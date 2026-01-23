@@ -166,6 +166,38 @@ body {
     color: var(--black);
 }
 
+/* 下载简历按钮 */
+.download-resume-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--black);
+    color: var(--white);
+    border: none;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.download-resume-btn:hover {
+    background: var(--gray-dark);
+    transform: scale(1.02);
+}
+
+.download-resume-btn svg {
+    flex-shrink: 0;
+}
+
+/* 下载中状态 */
+.download-resume-btn.downloading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
 /* ============================================
    文字悬停效果
    ============================================ */
@@ -209,22 +241,12 @@ body {
     color: var(--accent);
 }
 
-/* 技能列表悬停 */
+/* 技能列表样式（无悬停动效） */
 .skills-list li {
-    transition: background 0.3s ease, padding-left 0.3s ease;
     border-radius: 8px;
     margin: 0 -12px;
     padding-left: 12px;
     padding-right: 12px;
-}
-
-.skills-list li:hover {
-    background: rgba(0, 0, 0, 0.03);
-    padding-left: 20px;
-}
-
-.skills-list li:hover .skill-name {
-    color: var(--accent);
 }
 
 /* 奖项悬停 */
@@ -485,6 +507,22 @@ body {
     text-align: center;
 }
 
+/* 项目分类标题 */
+.projects-category {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--gray-dark);
+    letter-spacing: 0.02em;
+    margin-bottom: 32px;
+    margin-top: 60px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.projects-category:first-of-type {
+    margin-top: 0;
+}
+
 .projects-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -532,6 +570,20 @@ a.project-card .project-desc {
     margin-bottom: 24px;
     border-radius: 16px;
     overflow: hidden;
+}
+
+/* 项目卡片真实图片样式 */
+.project-image img {
+    width: 100%;
+    aspect-ratio: 16/10;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+    pointer-events: auto;
+}
+
+.project-card:hover .project-image img {
+    transform: scale(1.05);
 }
 
 .project-image .image-placeholder {
@@ -921,6 +973,13 @@ a.contact-value:hover {
 
     .hamburger {
         display: flex;
+    }
+
+    /* 移动端下载按钮 */
+    .download-resume-btn {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+        margin-right: 12px;
     }
 
     .hero-title {

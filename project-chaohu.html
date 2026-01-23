@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安徽巢湖犇山壹品 - 陈丹霞作品集</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .project-detail { padding-top: 80px; }
+        .project-hero { padding: 60px 24px; background: var(--bg-secondary); }
+        .project-hero-content { max-width: 800px; margin: 0 auto; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--gray); text-decoration: none; font-size: 0.9rem; margin-bottom: 32px; transition: color 0.2s ease; }
+        .back-link:hover { color: var(--black); }
+        .project-hero h1 { font-size: 2.5rem; font-weight: 600; color: var(--black); margin-bottom: 16px; }
+        .project-meta { display: flex; gap: 24px; color: var(--gray); font-size: 0.95rem; margin-bottom: 24px; }
+        .project-description { font-size: 1.1rem; line-height: 1.8; color: var(--gray-dark); }
+        .project-gallery { padding: 60px 24px; max-width: 1200px; margin: 0 auto; }
+        .gallery-grid { display: flex; flex-direction: column; gap: 24px; }
+        .gallery-item { width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); }
+        .gallery-item img { width: 100%; height: auto; display: block; }
+        @media (max-width: 640px) { .project-hero h1 { font-size: 1.8rem; } .project-meta { flex-direction: column; gap: 8px; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar" style="background: rgba(251, 251, 253, 0.92);">
+        <div class="nav-container">
+            <a href="index.html" class="logo" style="color: var(--black);">陈丹霞</a>
+            <ul class="nav-links">
+                <li><a href="index.html#about" style="color: var(--gray-dark);">关于</a></li>
+                <li><a href="index.html#skills" style="color: var(--gray-dark);">技能</a></li>
+                <li><a href="index.html#projects" style="color: var(--gray-dark);">作品</a></li>
+                <li><a href="index.html#experience" style="color: var(--gray-dark);">经历</a></li>
+                <li><a href="index.html#contact" style="color: var(--gray-dark);">联系</a></li>
+            </ul>
+            <div class="hamburger"><span></span><span></span></div>
+        </div>
+    </nav>
+
+    <main class="project-detail">
+        <section class="project-hero">
+            <div class="project-hero-content">
+                <a href="index.html#projects" class="back-link">← 返回作品列表</a>
+                <h1>安徽巢湖犇山壹品</h1>
+                <div class="project-meta">
+                    <span>现代住宅景观</span>
+                    <span>【年份待补充】</span>
+                </div>
+                <p class="project-description">【项目简述待补充】</p>
+            </div>
+        </section>
+
+        <section class="project-gallery">
+            <div class="gallery-grid">
+                <div class="gallery-item"><img src="images/chaohu/1.jpg" alt="安徽巢湖犇山壹品效果图1"></div>
+                <div class="gallery-item"><img src="images/chaohu/2.jpg" alt="安徽巢湖犇山壹品效果图2"></div>
+                <div class="gallery-item"><img src="images/chaohu/3.jpg" alt="安徽巢湖犇山壹品效果图3"></div>
+                <div class="gallery-item"><img src="images/chaohu/4.jpg" alt="安徽巢湖犇山壹品效果图4"></div>
+                <div class="gallery-item"><img src="images/chaohu/5.jpg" alt="安徽巢湖犇山壹品效果图5"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container"><p class="footer-text">© 2025 陈丹霞</p></div>
+    </footer>
+
+    <script>
+        if (sessionStorage.getItem('portfolioAccess') !== 'granted') { window.location.href = 'login.html'; }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
