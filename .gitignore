@@ -1,0 +1,9 @@
+# 项目图片（保护版权，不上传）
+images/
+
+# 临时文件
+nul
+*.tmp
+
+# Claude配置
+.claude/
