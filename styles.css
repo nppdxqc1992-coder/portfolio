@@ -878,8 +878,10 @@ a.project-card .project-desc {
 
 .contact-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 24px;
+    max-width: 720px;
+    margin: 0 auto;
 }
 
 .contact-item {
@@ -1025,36 +1027,234 @@ a.contact-value:hover {
     .contact-item {
         padding: 16px;
     }
+
+    /* 移动端减少动画幅度 */
+    .animate-on-scroll {
+        transform: translateY(20px);
+    }
+
+    .animate-slide-left {
+        transform: translateX(-30px);
+    }
+
+    .animate-slide-right {
+        transform: translateX(30px);
+    }
 }
 
 /* ============================================
-   动画效果
+   滚动动画效果
    ============================================ */
-.fade-in {
+
+/* 基础动画类 - 向上淡入 */
+.animate-on-scroll {
     opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
+    transform: translateY(40px);
+    transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.fade-in.visible {
+.animate-on-scroll.visible {
     opacity: 1;
     transform: translateY(0);
 }
 
-/* 平滑滚动增强 */
-@media (prefers-reduced-motion: no-preference) {
-    .project-card,
-    .experience-item,
-    .award-item {
-        opacity: 0;
-        transform: translateY(20px);
-    }
+/* 从左侧滑入 */
+.animate-slide-left {
+    opacity: 0;
+    transform: translateX(-60px);
+    transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
 
-    .project-card.visible,
-    .experience-item.visible,
-    .award-item.visible {
+.animate-slide-left.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* 从右侧滑入 */
+.animate-slide-right {
+    opacity: 0;
+    transform: translateX(60px);
+    transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.animate-slide-right.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* 缩放淡入 */
+.animate-scale {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.animate-scale.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* 标题专用动画 - 更优雅的淡入 */
+.animate-title {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.animate-title.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 延迟动画类 - 用于错落效果 */
+.delay-1 { transition-delay: 0.1s; }
+.delay-2 { transition-delay: 0.2s; }
+.delay-3 { transition-delay: 0.3s; }
+.delay-4 { transition-delay: 0.4s; }
+.delay-5 { transition-delay: 0.5s; }
+.delay-6 { transition-delay: 0.6s; }
+
+/* Hero区域入场动画 */
+.hero-content {
+    animation: heroFadeIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.hero-subtitle {
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out 0.3s forwards;
+}
+
+.hero-title {
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out 0.5s forwards;
+}
+
+.hero-desc {
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out 0.7s forwards;
+}
+
+.scroll-hint {
+    opacity: 0;
+    animation: fadeIn 1s ease-out 1.2s forwards;
+}
+
+@keyframes heroFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
         opacity: 1;
         transform: translateY(0);
-        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* 项目卡片动画增强 */
+@media (prefers-reduced-motion: no-preference) {
+    .project-card {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                    transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                    box-shadow 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .project-card.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* 工作经历项动画 */
+    .experience-item {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .experience-item.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* 奖项动画 */
+    .awards-inline .award-item {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    }
+
+    .awards-inline .award-item.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* 技能列表动画 */
+    .skills-list li {
+        opacity: 0;
+        transform: translateX(-20px);
+        transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+    }
+
+    .skills-list li.visible {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* 联系方式动画 */
+    .contact-item {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease-out, transform 0.5s ease-out, color 0.2s ease;
+    }
+
+    .contact-item.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 用户偏好减少动画时禁用动画 */
+@media (prefers-reduced-motion: reduce) {
+    .animate-on-scroll,
+    .animate-slide-left,
+    .animate-slide-right,
+    .animate-scale,
+    .animate-title,
+    .project-card,
+    .experience-item,
+    .award-item,
+    .skills-list li,
+    .contact-item {
+        opacity: 1;
+        transform: none;
+        transition: none;
+        animation: none;
+    }
+
+    .hero-subtitle,
+    .hero-title,
+    .hero-desc,
+    .scroll-hint {
+        opacity: 1;
+        animation: none;
     }
 }

@@ -77,27 +77,107 @@ function initNavbarStyle() {
     updateNavbar();
 }
 
-// 滚动显示动画
+// 滚动显示动画 - 增强版
 function initScrollReveal() {
-    const elements = document.querySelectorAll('.project-card, .experience-item, .award-item');
+    // 检测用户是否偏好减少动画
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+    }
 
-    if (!elements.length) return;
+    // 1. 通用动画元素（自定义类）
+    const animatedElements = document.querySelectorAll('.animate-on-scroll, .animate-slide-left, .animate-slide-right, .animate-scale, .animate-title');
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry, index) => {
-            if (entry.isIntersecting) {
-                setTimeout(() => {
+    // 2. 项目卡片（错落动画）
+    const projectCards = document.querySelectorAll('.project-card');
+
+    // 3. 工作经历（错落动画）
+    const experienceItems = document.querySelectorAll('.experience-item');
+
+    // 4. 奖项列表（错落动画）
+    const awardItems = document.querySelectorAll('.awards-inline .award-item');
+
+    // 5. 技能列表（错落动画）
+    const skillItems = document.querySelectorAll('.skills-list li');
+
+    // 6. 联系方式（错落动画）
+    const contactItems = document.querySelectorAll('.contact-item');
+
+    // 7. section标题（单独处理）
+    const sectionLabels = document.querySelectorAll('.section-label');
+    const sectionTitles = document.querySelectorAll('.section-title');
+
+    // 创建观察器 - 通用元素
+    const createObserver = (threshold = 0.1, rootMargin = '0px 0px -50px 0px') => {
+        return new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
-                }, index * 100);
-                observer.unobserve(entry.target);
-            }
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold, rootMargin });
+    };
+
+    // 创建带延迟的观察器 - 用于列表项的错落效果
+    const createStaggeredObserver = (staggerDelay = 80, threshold = 0.1) => {
+        let visibleCount = 0;
+
+        return new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    // 获取元素在同级中的索引来计算延迟
+                    const siblings = entry.target.parentElement.children;
+                    let index = Array.from(siblings).indexOf(entry.target);
+
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, index * staggerDelay);
+
+                    staggeredObserver.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold,
+            rootMargin: '0px 0px -30px 0px'
         });
-    }, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = createObserver();
+    const staggeredObserver = createStaggeredObserver(80);
+    const skillObserver = createStaggeredObserver(60);
+    const contactObserver = createStaggeredObserver(100);
+
+    // 为section标题添加动画类并观察
+    sectionLabels.forEach(el => {
+        el.classList.add('animate-title');
+        observer.observe(el);
     });
 
-    elements.forEach(el => observer.observe(el));
+    sectionTitles.forEach(el => {
+        el.classList.add('animate-title', 'delay-1');
+        observer.observe(el);
+    });
+
+    // 观察通用动画元素
+    animatedElements.forEach(el => observer.observe(el));
+
+    // 观察项目卡片（错落效果）
+    projectCards.forEach((el, index) => {
+        el.style.transitionDelay = `${(index % 2) * 0.15}s`;
+        staggeredObserver.observe(el);
+    });
+
+    // 观察工作经历
+    experienceItems.forEach(el => staggeredObserver.observe(el));
+
+    // 观察奖项
+    awardItems.forEach(el => staggeredObserver.observe(el));
+
+    // 观察技能列表
+    skillItems.forEach(el => skillObserver.observe(el));
+
+    // 观察联系方式
+    contactItems.forEach(el => contactObserver.observe(el));
 }
 
 // 平滑滚动
