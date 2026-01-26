@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>海盐蓝城春风如意 - 陈丹霞作品集</title>
+    <title>淮北桃花源 - 陈丹霞作品集</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -19,6 +19,7 @@
         .gallery-grid { display: flex; flex-direction: column; gap: 24px; }
         .gallery-item { width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); }
         .gallery-item img { width: 100%; height: auto; display: block; }
+        .no-images { text-align: center; padding: 60px; color: var(--gray); }
         @media (max-width: 640px) { .project-hero h1 { font-size: 1.8rem; } .project-meta { flex-direction: column; gap: 8px; } }
     </style>
 </head>
@@ -41,46 +42,33 @@
         <section class="project-hero">
             <div class="project-hero-content">
                 <a href="index.html#projects" class="back-link">← 返回作品列表</a>
-                <h1>海盐蓝城春风如意</h1>
+                <h1>淮北桃花源</h1>
                 <div class="project-meta">
-                    <span>中式合院 · 山水景观</span>
-                    <span>2019 - 2022</span>
+                    <span>现代高层 · 中式住宅</span>
+                    <span>2021</span>
                 </div>
-                <p class="project-description">
-                    紧邻南北湖景区，利用高差打造层层递进的中式合院，延续起承转合的叙事节奏。
-                </p>
+                <p class="project-description">以桃花源为意境，将古典园林意境融入现代高层住宅，营造闹中取静的理想居所。</p>
             </div>
         </section>
 
         <section class="project-gallery">
             <div class="gallery-grid">
-                <div class="gallery-item"><img src="images/haiyan/1.jpg" alt="海盐春风如意效果图1"></div>
-                <div class="gallery-item"><img src="images/haiyan/2.jpg" alt="海盐春风如意效果图2"></div>
-                <div class="gallery-item"><img src="images/haiyan/3.jpg" alt="海盐春风如意效果图3"></div>
-                <div class="gallery-item"><img src="images/haiyan/4.jpg" alt="海盐春风如意效果图4"></div>
-                <div class="gallery-item"><img src="images/haiyan/5.jpg" alt="海盐春风如意效果图5"></div>
-                <div class="gallery-item"><img src="images/haiyan/6.jpg" alt="海盐春风如意效果图6"></div>
-                <div class="gallery-item"><img src="images/haiyan/7.jpg" alt="海盐春风如意效果图7"></div>
-                <div class="gallery-item"><img src="images/haiyan/8.jpg" alt="海盐春风如意效果图8"></div>
-                <div class="gallery-item"><img src="images/haiyan/9.jpg" alt="海盐春风如意效果图9"></div>
-                <div class="gallery-item"><img src="images/haiyan/10.jpg" alt="海盐春风如意效果图10"></div>
-                <div class="gallery-item"><img src="images/haiyan/11.jpg" alt="海盐春风如意效果图11"></div>
-                <div class="gallery-item"><img src="images/haiyan/12.jpg" alt="海盐春风如意效果图12"></div>
-                <div class="gallery-item"><img src="images/haiyan/13.jpg" alt="海盐春风如意效果图13"></div>
+                <div class="gallery-item"><img src="images/taohuayuan/1.jpg" alt="淮北桃花源 1"></div>
+                <div class="gallery-item"><img src="images/taohuayuan/2.jpg" alt="淮北桃花源 2"></div>
+                <div class="gallery-item"><img src="images/taohuayuan/3.jpg" alt="淮北桃花源 3"></div>
+                <div class="gallery-item"><img src="images/taohuayuan/4.jpg" alt="淮北桃花源 4"></div>
+                <div class="gallery-item"><img src="images/taohuayuan/5.jpg" alt="淮北桃花源 5"></div>
+                <div class="gallery-item"><img src="images/taohuayuan/6.jpg" alt="淮北桃花源 6"></div>
             </div>
         </section>
     </main>
 
     <footer class="footer">
-        <div class="container">
-            <p class="footer-text">© 2025 陈丹霞</p>
-        </div>
+        <div class="container"><p class="footer-text">© 2025 陈丹霞</p></div>
     </footer>
 
     <script>
-        if (sessionStorage.getItem('portfolioAccess') !== 'granted') {
-            window.location.href = 'login.html';
-        }
+        if (sessionStorage.getItem('portfolioAccess') !== 'granted') { window.location.href = 'login.html'; }
     </script>
     <script src="script.js"></script>
 </body>
