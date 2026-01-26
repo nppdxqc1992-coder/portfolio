@@ -815,6 +815,24 @@ a.project-card .project-desc {
     color: var(--gray);
 }
 
+/* 荣誉奖项 - 竖向列表 */
+.awards-inline {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.awards-inline .award-item {
+    display: block;
+    padding: 0;
+    border-bottom: none;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--black);
+    white-space: nowrap;
+}
+
 /* ============================================
    结语 / 求职理念
    ============================================ */
@@ -844,8 +862,9 @@ a.project-card .project-desc {
     font-weight: 300;
     line-height: 2;
     color: rgba(255, 255, 255, 0.85);
-    max-width: 640px;
+    max-width: 720px;
     margin: 0 auto;
+    word-break: keep-all;
 }
 
 /* ============================================
