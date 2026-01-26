@@ -10,24 +10,18 @@
 }
 
 /* ============================================
-   内容保护样式
+   内容保护样式（移动端兼容）
    ============================================ */
-/* 禁用图片选择和拖拽 */
+/* 禁用图片选择和拖拽 - 移动端友好版本 */
 img {
     -webkit-user-drag: none;
-    -khtml-user-drag: none;
-    -moz-user-drag: none;
-    -o-user-drag: none;
     user-drag: none;
     -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -o-user-select: none;
     user-select: none;
-    pointer-events: none;
+    -webkit-touch-callout: none;
 }
 
-/* 图片容器保护层 */
+/* 图片容器 */
 .image-placeholder,
 .image-frame,
 .project-image,
@@ -36,18 +30,12 @@ img {
     position: relative;
 }
 
-.image-placeholder::after,
-.image-frame::after,
-.project-image::after,
-.project-hero-image::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: transparent;
-    z-index: 1;
+/* 确保所有图片在移动端正常显示 */
+.gallery-item img,
+.project-image img {
+    display: block;
+    width: 100%;
+    height: auto;
 }
 
 /* 打印时隐藏内容 */
