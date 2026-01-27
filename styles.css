@@ -10,15 +10,13 @@
 }
 
 /* ============================================
-   内容保护样式（移动端兼容）
+   图片基础样式（移动端优先）
    ============================================ */
-/* 禁用图片选择和拖拽 - 移动端友好版本 */
+/* 所有图片的基础样式 - 确保移动端正常显示 */
 img {
-    -webkit-user-drag: none;
-    user-drag: none;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-touch-callout: none;
+    display: block;
+    max-width: 100%;
+    height: auto;
 }
 
 /* 图片容器 */
@@ -28,14 +26,16 @@ img {
 .project-hero-image,
 .gallery-item {
     position: relative;
+    overflow: hidden;
 }
 
-/* 确保所有图片在移动端正常显示 */
+/* 项目图片和画廊图片 */
 .gallery-item img,
 .project-image img {
     display: block;
     width: 100%;
     height: auto;
+    object-fit: cover;
 }
 
 /* 打印时隐藏内容 */
