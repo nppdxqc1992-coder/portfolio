@@ -154,6 +154,16 @@ body {
     color: var(--black);
 }
 
+/* 导航栏微信图标 */
+.nav-wechat {
+    display: flex;
+    align-items: center;
+}
+
+.nav-wechat:hover {
+    color: #07c160 !important;
+}
+
 /* 下载简历按钮 */
 .download-resume-btn {
     display: inline-flex;
