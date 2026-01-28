@@ -51,20 +51,25 @@ function initNavbarStyle() {
         const heroBottom = hero.offsetHeight;
         const scrollY = window.scrollY;
 
+        const wechatIcon = navbar.querySelector('.nav-wechat');
+
         if (scrollY > heroBottom - 52) {
             navbar.style.background = 'rgba(251, 251, 253, 0.92)';
         } else if (scrollY > 100) {
             navbar.style.background = 'rgba(0, 0, 0, 0.8)';
             navbar.querySelectorAll('a').forEach(a => a.style.color = '#fff');
+            if (wechatIcon) wechatIcon.style.color = '#fff';
         } else {
             navbar.style.background = 'transparent';
             navbar.querySelectorAll('a').forEach(a => a.style.color = '#fff');
+            if (wechatIcon) wechatIcon.style.color = '#fff';
         }
 
-        // 恢复正常颜色
+        // 恢复正常颜色（白色背景时）
         if (scrollY > heroBottom - 52) {
             navbar.querySelectorAll('.nav-links a').forEach(a => a.style.color = '');
             navbar.querySelector('.logo').style.color = '';
+            if (wechatIcon) wechatIcon.style.color = '#424245';
         }
     };
 
@@ -72,6 +77,8 @@ function initNavbarStyle() {
     navbar.style.background = 'transparent';
     navbar.style.borderBottom = 'none';
     navbar.querySelectorAll('a').forEach(a => a.style.color = '#fff');
+    const wechatIconInit = navbar.querySelector('.nav-wechat');
+    if (wechatIconInit) wechatIconInit.style.color = '#fff';
 
     window.addEventListener('scroll', updateNavbar, { passive: true });
     updateNavbar();
