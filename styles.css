@@ -477,6 +477,60 @@ body {
     color: var(--black);
 }
 
+/* 核心优势 */
+.core-advantages {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid var(--gray-light);
+}
+
+.advantages-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--gray);
+    margin-bottom: 24px;
+}
+
+.advantages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.advantage-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.advantage-icon {
+    font-size: 1.2rem;
+    color: var(--gray);
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.advantage-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.advantage-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--black);
+}
+
+.advantage-desc {
+    font-size: 0.85rem;
+    color: var(--gray);
+    line-height: 1.6;
+}
+
 /* ============================================
    专业技能
    ============================================ */
