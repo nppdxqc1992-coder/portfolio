@@ -156,8 +156,15 @@ body {
 
 /* 导航栏微信图标 */
 .nav-wechat {
-    display: flex;
-    align-items: center;
+    display: inline-flex;
+    vertical-align: middle;
+    margin-left: 4px;
+    cursor: pointer;
+    color: inherit;
+}
+
+.nav-wechat svg {
+    vertical-align: middle;
 }
 
 .nav-wechat:hover {
