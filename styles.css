@@ -950,6 +950,41 @@ a.contact-value:hover {
     color: var(--accent);
 }
 
+/* 微信复制功能 */
+.wechat-item {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.wechat-item:hover {
+    transform: translateY(-2px);
+}
+
+.wechat-item:hover .contact-value {
+    color: #07c160;
+}
+
+.wechat-icon {
+    vertical-align: middle;
+    margin-left: 4px;
+    color: #07c160;
+}
+
+.copy-hint {
+    font-size: 0.75rem;
+    color: var(--gray);
+    margin-left: 8px;
+    opacity: 0.6;
+}
+
+.wechat-item:hover .copy-hint {
+    opacity: 1;
+}
+
+.copy-success {
+    color: #07c160 !important;
+}
+
 /* ============================================
    页脚
    ============================================ */
