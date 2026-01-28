@@ -561,17 +561,23 @@
 
                 ctx.font = px(3.5) + 'px "Microsoft YaHei", sans-serif';
                 ctx.fillStyle = '#666666';
-                ctx.fillText('景观设计师 | 11年经验 | 杭州', canvas.width / 2, px(margin + 10));
+                ctx.fillText('景观设计师 | 11年经验 | 杭州 | 159 8821 2696', canvas.width / 2, px(margin + 10));
+
+                // 网页链接
+                ctx.font = px(2.8) + 'px "Microsoft YaHei", sans-serif';
+                ctx.fillStyle = '#2997ff';
+                const websiteUrl = 'nppdxqc1992-coder.github.io/portfolio';
+                ctx.fillText('在线简历: ' + websiteUrl, canvas.width / 2, px(margin + 15));
 
                 // 分割线
                 ctx.strokeStyle = '#1d1d1f';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.moveTo(px(margin), px(margin + 18));
-                ctx.lineTo(px(pageWidth - margin), px(margin + 18));
+                ctx.moveTo(px(margin), px(margin + 21));
+                ctx.lineTo(px(pageWidth - margin), px(margin + 21));
                 ctx.stroke();
 
-                let currentY = margin + 25;
+                let currentY = margin + 28;
                 ctx.textAlign = 'left';
 
                 // 辅助函数：绘制标题
@@ -688,6 +694,9 @@
                 // 将canvas转为图片添加到PDF
                 const imgData = canvas.toDataURL('image/jpeg', 1.0);
                 doc.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
+
+                // 添加可点击的网址链接（位置对应"在线简历"文字区域）
+                doc.link(50, 33, 110, 6, { url: 'https://nppdxqc1992-coder.github.io/portfolio/' });
 
                 // 下载PDF
                 doc.save('陈丹霞_景观设计师_简历.pdf');
