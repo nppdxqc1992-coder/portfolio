@@ -702,15 +702,33 @@
         function copyWechat() {
             const wechatId = '15988212696';
             navigator.clipboard.writeText(wechatId).then(() => {
+                // 更新底部联系区域的提示
                 const hint = document.querySelector('.copy-hint');
                 const value = document.querySelector('.wechat-value');
-                hint.textContent = '已复制!';
-                value.classList.add('copy-success');
+                if (hint) hint.textContent = '已复制!';
+                if (value) value.classList.add('copy-success');
                 setTimeout(() => {
-                    hint.textContent = '点击复制';
-                    value.classList.remove('copy-success');
+                    if (hint) hint.textContent = '点击复制';
+                    if (value) value.classList.remove('copy-success');
                 }, 2000);
+
+                // 显示全局提示
+                showToast('微信号已复制');
             });
+        }
+
+        // 显示提示框
+        function showToast(msg) {
+            let toast = document.getElementById('toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                toast.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:9999;opacity:0;transition:opacity 0.3s;';
+                document.body.appendChild(toast);
+            }
+            toast.textContent = msg;
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; }, 2000);
         }
     </script>
 
