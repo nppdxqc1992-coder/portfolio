@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        if (sessionStorage.getItem('portfolioAccess') !== 'granted') {
+            window.location.replace('login.html');
+        }
+    </script>
     <title>安徽巢湖犇山壹品 - 陈丹霞作品集</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
@@ -65,9 +70,6 @@
         <div class="container"><p class="footer-text">© 2025 陈丹霞</p></div>
     </footer>
 
-    <script>
-        if (sessionStorage.getItem('portfolioAccess') !== 'granted') { window.location.href = 'login.html'; }
-    </script>
     <script src="script.js"></script>
 </body>
 </html>
