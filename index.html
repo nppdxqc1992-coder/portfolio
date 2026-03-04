@@ -516,7 +516,7 @@
     <!-- jsPDF库 - 将canvas转为PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <!-- 下载作品集功能 - 专为PDF设计的独立布局，每个项目一页 -->
+    <!-- 下载作品集功能 - 每页2张图，保持图片原始比例，不变形不裁切 -->
     <script>
         async function downloadResume() {
             const btn = document.querySelector('.download-resume-btn');
@@ -526,7 +526,6 @@
             btn.classList.add('downloading');
             btn.innerHTML = spinner + ' 准备中...';
 
-            // 全部16个项目数据
             const projects = [
                 { name: '海盐春风如意里',       year: '2019-2022', type: '中式合院 · 山水景观',      folder: 'haiyan',         category: '中式项目' },
                 { name: '扬州中和绿城春江明月',  year: '2021-2022', type: '小镇中心 · 合院样板区',    folder: 'yangzhou',       category: '中式项目' },
@@ -546,62 +545,35 @@
                 { name: '海月天宸',              year: '2024',      type: '现代住宅景观（投标）',     folder: 'haiyuetianchen', category: '现代项目' },
             ];
 
-            // 预先尝试加载图片，返回实际存在的图片src列表
-            async function getAvailableImages(folder, maxCount = 4) {
-                const checks = Array.from({ length: maxCount }, (_, i) => new Promise(resolve => {
+            // 加载图片并等比缩放到指定最大尺寸（不裁切、不变形）
+            // 核心：用 canvas 预渲染，再转为 dataURL，html2canvas 看到的就是精确像素，无需 object-fit
+            async function loadAndFitImage(src, maxW, maxH) {
+                return new Promise((resolve) => {
                     const img = new Image();
-                    img.onload = () => resolve(`images/${folder}/${i + 1}.jpg`);
+                    img.crossOrigin = 'anonymous';
+                    img.onload = function() {
+                        // 计算等比缩放后的尺寸，确保宽高都不超过最大值
+                        const scale = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight);
+                        const w = Math.round(img.naturalWidth * scale);
+                        const h = Math.round(img.naturalHeight * scale);
+                        const c = document.createElement('canvas');
+                        c.width = w; c.height = h;
+                        c.getContext('2d').drawImage(img, 0, 0, w, h);
+                        resolve({ data: c.toDataURL('image/jpeg', 0.88), w, h });
+                    };
                     img.onerror = () => resolve(null);
-                    img.src = `images/${folder}/${i + 1}.jpg`;
-                }));
-                return (await Promise.all(checks)).filter(Boolean);
+                    img.src = src;
+                });
             }
 
-            // 根据图片数量生成不同网格布局的HTML
-            function buildImageGrid(imgList, gridH) {
-                const n = imgList.length;
-                const imgStyle = `width:100%;height:100%;object-fit:cover;display:block;`;
-                if (n === 0) return '';
-                if (n === 1) {
-                    return `<div style="height:${gridH}px;"><img src="${imgList[0]}" style="${imgStyle}" /></div>`;
-                }
-                if (n === 2) {
-                    return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;height:${gridH}px;">
-                        ${imgList.map(s => `<img src="${s}" style="${imgStyle}" />`).join('')}
-                    </div>`;
-                }
-                if (n === 3) {
-                    const topH = Math.round(gridH * 0.56);
-                    const botH = gridH - topH - 5;
-                    return `<div style="display:flex;flex-direction:column;gap:5px;height:${gridH}px;">
-                        <img src="${imgList[0]}" style="${imgStyle}height:${topH}px;" />
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;height:${botH}px;">
-                            <img src="${imgList[1]}" style="${imgStyle}" />
-                            <img src="${imgList[2]}" style="${imgStyle}" />
-                        </div>
-                    </div>`;
-                }
-                // 4张：2×2网格
-                return `<div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:5px;height:${gridH}px;">
-                    ${imgList.map(s => `<img src="${s}" style="${imgStyle}" />`).join('')}
-                </div>`;
-            }
-
-            // 创建隐藏容器（放到屏幕外）
+            // 隐藏容器（在屏幕外）
             const container = document.createElement('div');
             container.style.cssText = 'position:absolute;left:-9999px;top:0;width:794px;z-index:-999;';
             document.body.appendChild(container);
 
-            // 将一个页面div截图并写入PDF
+            // 截图并写入PDF（img标签是data:URL，直接可用，无需等待加载）
             async function capturePage(pdf, html, isFirst) {
                 container.innerHTML = html;
-                // 等待容器内所有图片加载完成
-                const imgs = [...container.querySelectorAll('img')];
-                await Promise.all(imgs.map(img =>
-                    (img.complete && img.naturalHeight > 0)
-                        ? Promise.resolve()
-                        : new Promise(r => { img.onload = r; img.onerror = r; })
-                ));
                 const canvas = await html2canvas(container.firstElementChild, {
                     scale: 1.5,
                     useCORS: true,
@@ -609,8 +581,6 @@
                     logging: false,
                     width: 794,
                     height: 1123,
-                    windowWidth: 794,
-                    windowHeight: 1123,
                 });
                 if (!isFirst) pdf.addPage();
                 pdf.addImage(canvas.toDataURL('image/jpeg', 0.88), 'JPEG', 0, 0, 210, 297);
@@ -619,10 +589,13 @@
             try {
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
-                const W = 794, H = 1123; // A4比例（96dpi）
+                const W = 794, H = 1123;
+                const PAD = 56;           // 左右内边距
+                const IMG_W = W - PAD * 2; // 图片最大宽度 = 682px
+                const IMG_MAX_H = 450;     // 单张图片最大高度（保证2张能竖排）
                 const fontStack = `'Noto Sans SC', 'Microsoft YaHei', sans-serif`;
 
-                // ── 封面页 ──────────────────────────────────────
+                // ── 封面页 ──────────────────────────────────────────
                 await capturePage(pdf, `
                     <div style="width:${W}px;height:${H}px;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:${fontStack};box-sizing:border-box;">
                         <img src="images/portrait.jpg" style="width:160px;height:160px;object-fit:cover;border-radius:50%;margin-bottom:36px;" onerror="this.style.display='none'" />
@@ -634,16 +607,26 @@
 
                 btn.innerHTML = spinner + ' 生成简介页...';
 
-                // ── 个人简介页 ──────────────────────────────────
+                // ── 个人简介页 ───────────────────────────────────────
                 await capturePage(pdf, `
                     <div style="width:${W}px;height:${H}px;background:#fff;padding:72px 80px;font-family:${fontStack};box-sizing:border-box;">
                         <h1 style="font-size:38px;color:#1d1d1f;font-weight:600;margin:0 0 8px;">关于我</h1>
                         <div style="width:50px;height:2px;background:#1d1d1f;margin-bottom:30px;"></div>
                         <p style="font-size:14px;color:#444;line-height:2.1;margin:0 0 36px;">
                             深耕房地产景观设计，具备近数十个品质项目的完整落地经验，曾深度参与蓝城、绿城、融创等多个一线品牌项目，涵盖住宅、酒店、商业街区等多元业态。<br><br>
-                            坚持扎根一线，能快速适应变化、持续迭代技术能力与工作方法，始终以专业、负责的态度推进设计，确保项目从构思到建成的高质量呈现。<br><br>
-                            面对AI技术浪潮，以开放之心拥抱变化，持续探索其与人文设计的融合之道。景观的本质，始终在于构建人与天地之间那份可感、可忆、可归属的联结。
+                            坚持扎根一线，能快速适应变化、持续迭代技术能力与工作方法，始终以专业、负责的态度推进设计，确保项目从构思到建成的高质量呈现。
                         </p>
+                        <h2 style="font-size:20px;color:#1d1d1f;margin:0 0 14px;padding-top:24px;border-top:1px solid #eee;">专业技能</h2>
+                        <div style="display:flex;gap:40px;margin-bottom:30px;">
+                            <div style="flex:1;">
+                                <p style="font-size:11px;color:#888;margin:0 0 10px;letter-spacing:1px;">设计工具</p>
+                                <p style="font-size:13px;color:#444;line-height:2.2;margin:0;">AutoCAD · SketchUp · InDesign<br>Photoshop · D5 · WPS</p>
+                            </div>
+                            <div style="flex:1;">
+                                <p style="font-size:11px;color:#888;margin:0 0 10px;letter-spacing:1px;">核心能力</p>
+                                <p style="font-size:13px;color:#444;line-height:2.2;margin:0;">场地规划分析 · 概念方案设计<br>方案深化设计 · 项目汇报沟通<br>iPad绘图 · AI辅助设计</p>
+                            </div>
+                        </div>
                         <h2 style="font-size:20px;color:#1d1d1f;margin:0 0 18px;padding-top:24px;border-top:1px solid #eee;">工作经历</h2>
                         <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:30px;">
                             <tr><td style="padding:8px 0;color:#1d1d1f;font-weight:600;">杭州壹合景观设计有限公司</td><td style="color:#888;">主创设计师</td><td style="color:#888;text-align:right;">2022.5 — 至今</td></tr>
@@ -655,23 +638,46 @@
                         <p style="font-size:14px;color:#444;line-height:2;">中级工程师 &nbsp;·&nbsp; 2019年蓝城集团优秀员工奖 &nbsp;·&nbsp; 嘉兴南北湖蓝城春风如意里项目荣获GHDA金奖</p>
                     </div>`, false);
 
-                // ── 每个项目一页 ────────────────────────────────
+                // ── 每个项目：最多4张图，每页2张竖排，保持原始比例 ────
                 for (let i = 0; i < projects.length; i++) {
                     const p = projects[i];
                     btn.innerHTML = spinner + ` 生成项目 ${i + 1}/${projects.length}...`;
 
-                    const imgList = await getAvailableImages(p.folder, 4);
-                    const headerH = 118;  // 顶部文字区高度
-                    const padH = 100;     // 上下内边距合计
-                    const gridH = H - headerH - padH;
+                    // 并行加载最多4张图，等比缩放，获取精确尺寸
+                    const loaded = (await Promise.all(
+                        [1, 2, 3, 4].map(n => loadAndFitImage(`images/${p.folder}/${n}.jpg`, IMG_W, IMG_MAX_H))
+                    )).filter(Boolean);
 
-                    await capturePage(pdf, `
-                        <div style="width:${W}px;height:${H}px;background:#0f0f0f;padding:52px 56px 48px;font-family:${fontStack};box-sizing:border-box;">
-                            <p style="color:#666;font-size:11px;margin:0 0 8px;letter-spacing:2px;">${p.category.toUpperCase()} · ${p.year}</p>
-                            <h2 style="color:#fff;font-size:26px;font-weight:600;margin:0 0 8px;">${p.name}</h2>
-                            <p style="color:#aaa;font-size:13px;margin:0 0 22px;">${p.type}</p>
-                            ${buildImageGrid(imgList, gridH)}
-                        </div>`, false);
+                    if (loaded.length === 0) continue;
+
+                    // 将图片分组，每组最多2张，逐组生成一页
+                    for (let g = 0; g < loaded.length; g += 2) {
+                        const group = loaded.slice(g, g + 2);
+                        const isFirstPage = (g === 0);
+
+                        // 头部区域（只在项目第一页显示）
+                        const headerHTML = isFirstPage ? `
+                            <div style="margin-bottom:20px;">
+                                <p style="color:#666;font-size:11px;margin:0 0 6px;letter-spacing:2px;">${p.category.toUpperCase()} · ${p.year}</p>
+                                <h2 style="color:#fff;font-size:26px;font-weight:600;margin:0 0 6px;">${p.name}</h2>
+                                <p style="color:#aaa;font-size:13px;margin:0;">${p.type}</p>
+                            </div>` : `
+                            <div style="margin-bottom:16px;">
+                                <p style="color:#555;font-size:12px;margin:0;">${p.name} — 续</p>
+                            </div>`;
+
+                        // 图片区：每张用精确的 width/height（来自loadAndFitImage），无需object-fit
+                        const imgsHTML = group.map(img => `
+                            <div style="display:flex;justify-content:center;margin-bottom:10px;">
+                                <img src="${img.data}" style="width:${img.w}px;height:${img.h}px;display:block;" />
+                            </div>`).join('');
+
+                        await capturePage(pdf, `
+                            <div style="width:${W}px;height:${H}px;background:#0f0f0f;padding:52px ${PAD}px 48px;font-family:${fontStack};box-sizing:border-box;">
+                                ${headerHTML}
+                                ${imgsHTML}
+                            </div>`, false);
+                    }
                 }
 
                 document.body.removeChild(container);
