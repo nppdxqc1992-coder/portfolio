@@ -516,89 +516,173 @@
     <!-- jsPDF库 - 将canvas转为PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <!-- 下载作品集功能 - 将整个网页截图转为PDF -->
+    <!-- 下载作品集功能 - 专为PDF设计的独立布局，每个项目一页 -->
     <script>
         async function downloadResume() {
             const btn = document.querySelector('.download-resume-btn');
             const originalHTML = btn.innerHTML;
+            const spinner = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="20" stroke-dashoffset="0"><animateTransform attributeName="transform" type="rotate" from="0 8 8" to="360 8 8" dur="1s" repeatCount="indefinite"/></circle></svg>';
 
-            // 显示加载状态
             btn.classList.add('downloading');
-            btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="20" stroke-dashoffset="0"><animateTransform attributeName="transform" type="rotate" from="0 8 8" to="360 8 8" dur="1s" repeatCount="indefinite"/></circle></svg> 生成中...';
+            btn.innerHTML = spinner + ' 准备中...';
 
-            const navbar = document.querySelector('.navbar');
+            // 全部16个项目数据
+            const projects = [
+                { name: '海盐春风如意里',       year: '2019-2022', type: '中式合院 · 山水景观',      folder: 'haiyan',         category: '中式项目' },
+                { name: '扬州中和绿城春江明月',  year: '2021-2022', type: '小镇中心 · 合院样板区',    folder: 'yangzhou',       category: '中式项目' },
+                { name: '王江泾风荷九里',        year: '2019-2020', type: '中式住宅景观',             folder: 'fenghe',         category: '中式项目' },
+                { name: '盐城百禾小镇',          year: '2023',      type: '大型IP文旅中式小镇',       folder: 'baihe',          category: '中式项目' },
+                { name: '淮北桃花源',            year: '2021',      type: '现代高层 · 中式住宅',      folder: 'taohuayuan',     category: '中式项目' },
+                { name: '蓝城·就岭南',           year: '2021',      type: '中式住宅景观',             folder: 'jiulingnan',     category: '中式项目' },
+                { name: '嘉兴世合理想大地',      year: '2025',      type: '现代中式住宅景观',         folder: 'shiheli',        category: '现代中式' },
+                { name: '嘉兴秀璟湾',            year: '2025',      type: '现代中式住宅景观',         folder: 'xiujingwan',     category: '现代中式' },
+                { name: '郑州蓝城·江南里',       year: '2021',      type: '现代中式住宅景观',         folder: 'jiangnanli',     category: '现代中式' },
+                { name: '西安旭坤',              year: '2022',      type: '现代中式庭院景观',         folder: 'xukun',          category: '现代中式' },
+                { name: '柳州B31地块',           year: '2025',      type: '现代住宅景观',             folder: 'b31',            category: '现代项目' },
+                { name: '台州凤语和鸣',          year: '2024',      type: '现代住宅景观',             folder: 'fengyu',         category: '现代项目' },
+                { name: '安徽巢湖犇山壹品',      year: '2023',      type: '现代住宅景观',             folder: 'chaohu',         category: '现代项目' },
+                { name: '杭州西溪印',            year: '2021-2022', type: '商业办公 · 院落花园',      folder: 'xixiyin',        category: '现代项目' },
+                { name: '台州创融润园',          year: '2022',      type: '现代住宅景观',             folder: 'runyuan',        category: '现代项目' },
+                { name: '海月天宸',              year: '2024',      type: '现代住宅景观（投标）',     folder: 'haiyuetianchen', category: '现代项目' },
+            ];
+
+            // 预先尝试加载图片，返回实际存在的图片src列表
+            async function getAvailableImages(folder, maxCount = 4) {
+                const checks = Array.from({ length: maxCount }, (_, i) => new Promise(resolve => {
+                    const img = new Image();
+                    img.onload = () => resolve(`images/${folder}/${i + 1}.jpg`);
+                    img.onerror = () => resolve(null);
+                    img.src = `images/${folder}/${i + 1}.jpg`;
+                }));
+                return (await Promise.all(checks)).filter(Boolean);
+            }
+
+            // 根据图片数量生成不同网格布局的HTML
+            function buildImageGrid(imgList, gridH) {
+                const n = imgList.length;
+                const imgStyle = `width:100%;height:100%;object-fit:cover;display:block;`;
+                if (n === 0) return '';
+                if (n === 1) {
+                    return `<div style="height:${gridH}px;"><img src="${imgList[0]}" style="${imgStyle}" /></div>`;
+                }
+                if (n === 2) {
+                    return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;height:${gridH}px;">
+                        ${imgList.map(s => `<img src="${s}" style="${imgStyle}" />`).join('')}
+                    </div>`;
+                }
+                if (n === 3) {
+                    const topH = Math.round(gridH * 0.56);
+                    const botH = gridH - topH - 5;
+                    return `<div style="display:flex;flex-direction:column;gap:5px;height:${gridH}px;">
+                        <img src="${imgList[0]}" style="${imgStyle}height:${topH}px;" />
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;height:${botH}px;">
+                            <img src="${imgList[1]}" style="${imgStyle}" />
+                            <img src="${imgList[2]}" style="${imgStyle}" />
+                        </div>
+                    </div>`;
+                }
+                // 4张：2×2网格
+                return `<div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:5px;height:${gridH}px;">
+                    ${imgList.map(s => `<img src="${s}" style="${imgStyle}" />`).join('')}
+                </div>`;
+            }
+
+            // 创建隐藏容器（放到屏幕外）
+            const container = document.createElement('div');
+            container.style.cssText = 'position:absolute;left:-9999px;top:0;width:794px;z-index:-999;';
+            document.body.appendChild(container);
+
+            // 将一个页面div截图并写入PDF
+            async function capturePage(pdf, html, isFirst) {
+                container.innerHTML = html;
+                // 等待容器内所有图片加载完成
+                const imgs = [...container.querySelectorAll('img')];
+                await Promise.all(imgs.map(img =>
+                    (img.complete && img.naturalHeight > 0)
+                        ? Promise.resolve()
+                        : new Promise(r => { img.onload = r; img.onerror = r; })
+                ));
+                const canvas = await html2canvas(container.firstElementChild, {
+                    scale: 1.5,
+                    useCORS: true,
+                    allowTaint: false,
+                    logging: false,
+                    width: 794,
+                    height: 1123,
+                    windowWidth: 794,
+                    windowHeight: 1123,
+                });
+                if (!isFirst) pdf.addPage();
+                pdf.addImage(canvas.toDataURL('image/jpeg', 0.88), 'JPEG', 0, 0, 210, 297);
+            }
 
             try {
-                // 1. 强制显示所有因动画而隐藏的元素（scroll动画默认opacity:0）
-                document.querySelectorAll('.animate-on-scroll, .animate-slide-left, .animate-slide-right, .animate-scale, .animate-title').forEach(el => {
-                    el.classList.add('visible');
-                });
-
-                // 2. 临时隐藏固定导航栏（否则会在每页顶部重复出现）
-                navbar.style.visibility = 'hidden';
-
-                // 3. 滚动到页面顶部
-                const originalScrollY = window.scrollY;
-                window.scrollTo(0, 0);
-
-                // 等待渲染完成
-                await new Promise(resolve => setTimeout(resolve, 400));
-
-                // 4. 用html2canvas将整个网页截图（包含所有图片和设计）
-                const canvas = await html2canvas(document.body, {
-                    scale: 1.5,              // 1.5倍分辨率，清晰度与文件大小的平衡点
-                    useCORS: true,           // 允许跨域图片
-                    allowTaint: true,        // 允许图片污染canvas
-                    scrollX: 0,
-                    scrollY: 0,
-                    width: window.innerWidth,
-                    height: document.body.scrollHeight,
-                    windowWidth: window.innerWidth,
-                    windowHeight: document.body.scrollHeight,
-                    logging: false,
-                    backgroundColor: '#0a0a0a'  // 匹配页面背景色
-                });
-
-                // 5. 将截图分割成A4页面并生成PDF
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
+                const W = 794, H = 1123; // A4比例（96dpi）
+                const fontStack = `'Noto Sans SC', 'Microsoft YaHei', sans-serif`;
 
-                const pdfWidth = 210;   // A4宽度(mm)
-                const pdfHeight = 297;  // A4高度(mm)
+                // ── 封面页 ──────────────────────────────────────
+                await capturePage(pdf, `
+                    <div style="width:${W}px;height:${H}px;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:${fontStack};box-sizing:border-box;">
+                        <img src="images/portrait.jpg" style="width:160px;height:160px;object-fit:cover;border-radius:50%;margin-bottom:36px;" onerror="this.style.display='none'" />
+                        <h1 style="color:#fff;font-size:54px;font-weight:600;margin:0 0 16px;letter-spacing:6px;">陈丹霞</h1>
+                        <p style="color:#aaa;font-size:18px;margin:0 0 12px;letter-spacing:2px;">景观设计师 &nbsp;|&nbsp; 11年经验 &nbsp;|&nbsp; 杭州</p>
+                        <p style="color:#666;font-size:13px;margin:0 0 10px;">159 8821 2696 &nbsp;·&nbsp; 1067943503@qq.com</p>
+                        <p style="color:#2997ff;font-size:12px;margin:0;">nppdxqc1992-coder.github.io/portfolio</p>
+                    </div>`, true);
 
-                // 计算图片在PDF中的实际高度（保持宽高比）
-                const imgData = canvas.toDataURL('image/jpeg', 0.88);
-                const imgWidth = pdfWidth;
-                const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+                btn.innerHTML = spinner + ' 生成简介页...';
 
-                // 逐页写入（每次偏移一个A4页面的高度）
-                let heightLeft = imgHeight;
-                let yPos = 0;
+                // ── 个人简介页 ──────────────────────────────────
+                await capturePage(pdf, `
+                    <div style="width:${W}px;height:${H}px;background:#fff;padding:72px 80px;font-family:${fontStack};box-sizing:border-box;">
+                        <h1 style="font-size:38px;color:#1d1d1f;font-weight:600;margin:0 0 8px;">关于我</h1>
+                        <div style="width:50px;height:2px;background:#1d1d1f;margin-bottom:30px;"></div>
+                        <p style="font-size:14px;color:#444;line-height:2.1;margin:0 0 36px;">
+                            深耕房地产景观设计，具备近数十个品质项目的完整落地经验，曾深度参与蓝城、绿城、融创等多个一线品牌项目，涵盖住宅、酒店、商业街区等多元业态。<br><br>
+                            坚持扎根一线，能快速适应变化、持续迭代技术能力与工作方法，始终以专业、负责的态度推进设计，确保项目从构思到建成的高质量呈现。<br><br>
+                            面对AI技术浪潮，以开放之心拥抱变化，持续探索其与人文设计的融合之道。景观的本质，始终在于构建人与天地之间那份可感、可忆、可归属的联结。
+                        </p>
+                        <h2 style="font-size:20px;color:#1d1d1f;margin:0 0 18px;padding-top:24px;border-top:1px solid #eee;">工作经历</h2>
+                        <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:30px;">
+                            <tr><td style="padding:8px 0;color:#1d1d1f;font-weight:600;">杭州壹合景观设计有限公司</td><td style="color:#888;">主创设计师</td><td style="color:#888;text-align:right;">2022.5 — 至今</td></tr>
+                            <tr><td style="padding:8px 0;color:#1d1d1f;font-weight:600;">浙江绿城环境工程咨询管理有限公司</td><td style="color:#888;">资深景观设计师</td><td style="color:#888;text-align:right;">2018.5 — 2022.5</td></tr>
+                            <tr><td style="padding:8px 0;color:#1d1d1f;font-weight:600;">中国美院设计研究院设计师工作室</td><td style="color:#888;">景观设计师</td><td style="color:#888;text-align:right;">2016.4 — 2018.5</td></tr>
+                            <tr><td style="padding:8px 0;color:#1d1d1f;font-weight:600;">杭州绿风景观设计研究院</td><td style="color:#888;">景观设计师助理</td><td style="color:#888;text-align:right;">2015.7 — 2016.4</td></tr>
+                        </table>
+                        <h2 style="font-size:20px;color:#1d1d1f;margin:0 0 14px;padding-top:24px;border-top:1px solid #eee;">荣誉奖项</h2>
+                        <p style="font-size:14px;color:#444;line-height:2;">中级工程师 &nbsp;·&nbsp; 2019年蓝城集团优秀员工奖 &nbsp;·&nbsp; 嘉兴南北湖蓝城春风如意里项目荣获GHDA金奖</p>
+                    </div>`, false);
 
-                pdf.addImage(imgData, 'JPEG', 0, yPos, imgWidth, imgHeight);
-                heightLeft -= pdfHeight;
+                // ── 每个项目一页 ────────────────────────────────
+                for (let i = 0; i < projects.length; i++) {
+                    const p = projects[i];
+                    btn.innerHTML = spinner + ` 生成项目 ${i + 1}/${projects.length}...`;
 
-                while (heightLeft > 0) {
-                    yPos -= pdfHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'JPEG', 0, yPos, imgWidth, imgHeight);
-                    heightLeft -= pdfHeight;
+                    const imgList = await getAvailableImages(p.folder, 4);
+                    const headerH = 118;  // 顶部文字区高度
+                    const padH = 100;     // 上下内边距合计
+                    const gridH = H - headerH - padH;
+
+                    await capturePage(pdf, `
+                        <div style="width:${W}px;height:${H}px;background:#0f0f0f;padding:52px 56px 48px;font-family:${fontStack};box-sizing:border-box;">
+                            <p style="color:#666;font-size:11px;margin:0 0 8px;letter-spacing:2px;">${p.category.toUpperCase()} · ${p.year}</p>
+                            <h2 style="color:#fff;font-size:26px;font-weight:600;margin:0 0 8px;">${p.name}</h2>
+                            <p style="color:#aaa;font-size:13px;margin:0 0 22px;">${p.type}</p>
+                            ${buildImageGrid(imgList, gridH)}
+                        </div>`, false);
                 }
 
-                // 6. 下载PDF
+                document.body.removeChild(container);
                 pdf.save('陈丹霞_景观设计师_作品集.pdf');
-
-                // 7. 恢复页面状态
-                navbar.style.visibility = '';
-                window.scrollTo(0, originalScrollY);
 
             } catch (error) {
                 console.error('作品集PDF生成失败:', error);
                 alert('作品集PDF生成失败，请稍后重试');
-                if (navbar) navbar.style.visibility = '';
+                if (document.body.contains(container)) document.body.removeChild(container);
             }
 
-            // 恢复按钮状态
             btn.classList.remove('downloading');
             btn.innerHTML = originalHTML;
         }
