@@ -34,7 +34,7 @@
                     <path d="M8 12L3 7h3V2h4v5h3L8 12z" fill="currentColor"/>
                     <path d="M2 14h12v1H2v-1z" fill="currentColor"/>
                 </svg>
-                下载简历
+                下载作品集
             </button>
             <div class="hamburger">
                 <span></span>
@@ -511,10 +511,12 @@
         </div>
     </footer>
 
-    <!-- jsPDF库 - 支持中文 -->
+    <!-- html2canvas库 - 将网页截图为canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- jsPDF库 - 将canvas转为PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <!-- 下载简历功能 - 直接下载PDF -->
+    <!-- 下载作品集功能 - 将整个网页截图转为PDF -->
     <script>
         async function downloadResume() {
             const btn = document.querySelector('.download-resume-btn');
@@ -524,186 +526,76 @@
             btn.classList.add('downloading');
             btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="20" stroke-dashoffset="0"><animateTransform attributeName="transform" type="rotate" from="0 8 8" to="360 8 8" dur="1s" repeatCount="indefinite"/></circle></svg> 生成中...';
 
+            const navbar = document.querySelector('.navbar');
+
             try {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('p', 'mm', 'a4');
-
-                // 页面尺寸
-                const pageWidth = 210;
-                const pageHeight = 297;
-                const margin = 20;
-                const contentWidth = pageWidth - 2 * margin;
-                let y = margin;
-
-                // 加载思源黑体字体（Base64编码太大，改用canvas绘制方案）
-                // 创建canvas来渲染中文
-                const canvas = document.createElement('canvas');
-                canvas.width = 1654; // A4 @ 200dpi
-                canvas.height = 2339;
-                const ctx = canvas.getContext('2d');
-
-                // 白色背景
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                // 缩放比例
-                const scale = canvas.width / pageWidth;
-                const px = (mm) => mm * scale;
-
-                // 字体设置
-                ctx.fillStyle = '#1d1d1f';
-                ctx.textBaseline = 'top';
-
-                // 标题
-                ctx.font = 'bold ' + px(7) + 'px "Microsoft YaHei", sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('陈丹霞', canvas.width / 2, px(margin));
-
-                ctx.font = px(3.5) + 'px "Microsoft YaHei", sans-serif';
-                ctx.fillStyle = '#666666';
-                ctx.fillText('景观设计师 | 11年经验 | 杭州 | 159 8821 2696', canvas.width / 2, px(margin + 10));
-
-                // 网页链接
-                ctx.font = px(2.8) + 'px "Microsoft YaHei", sans-serif';
-                ctx.fillStyle = '#2997ff';
-                const websiteUrl = 'nppdxqc1992-coder.github.io/portfolio';
-                ctx.fillText('完整作品集请点击: ' + websiteUrl, canvas.width / 2, px(margin + 15));
-
-                // 分割线
-                ctx.strokeStyle = '#1d1d1f';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(px(margin), px(margin + 21));
-                ctx.lineTo(px(pageWidth - margin), px(margin + 21));
-                ctx.stroke();
-
-                let currentY = margin + 28;
-                ctx.textAlign = 'left';
-
-                // 辅助函数：绘制标题
-                function drawSectionTitle(title, yPos) {
-                    ctx.font = 'bold ' + px(4) + 'px "Microsoft YaHei", sans-serif';
-                    ctx.fillStyle = '#1d1d1f';
-                    ctx.fillText(title, px(margin), px(yPos));
-                    ctx.strokeStyle = '#dddddd';
-                    ctx.lineWidth = 1;
-                    ctx.beginPath();
-                    ctx.moveTo(px(margin), px(yPos + 6));
-                    ctx.lineTo(px(pageWidth - margin), px(yPos + 6));
-                    ctx.stroke();
-                    return yPos + 10;
-                }
-
-                // 辅助函数：绘制段落（自动换行）
-                function drawParagraph(text, yPos, fontSize = 3.2) {
-                    ctx.font = px(fontSize) + 'px "Microsoft YaHei", sans-serif';
-                    ctx.fillStyle = '#444444';
-                    const maxWidth = px(contentWidth);
-                    const lineHeight = px(fontSize * 1.8);
-                    const words = text.split('');
-                    let line = '';
-                    let testLine = '';
-
-                    for (let i = 0; i < words.length; i++) {
-                        testLine = line + words[i];
-                        if (ctx.measureText(testLine).width > maxWidth) {
-                            ctx.fillText(line, px(margin), px(yPos));
-                            line = words[i];
-                            yPos += fontSize * 1.8;
-                        } else {
-                            line = testLine;
-                        }
-                    }
-                    ctx.fillText(line, px(margin), px(yPos));
-                    return yPos + fontSize * 2.2;
-                }
-
-                // 个人简介
-                currentY = drawSectionTitle('个人简介', currentY);
-                currentY = drawParagraph('深耕房地产景观设计，具备近数十个品质项目的完整落地经验，曾深度参与蓝城、绿城、融创等多个一线品牌项目，涵盖住宅、酒店、商业街区等多元业态。坚持扎根一线，能快速适应变化、持续迭代技术能力与工作方法，始终以专业、负责的态度推进设计，确保项目从构思到建成的高质量呈现。', currentY);
-
-                currentY += 3;
-
-                // 教育背景
-                currentY = drawSectionTitle('教育背景', currentY);
-                currentY = drawParagraph('长春建筑学院 · 园林景观工程', currentY);
-
-                currentY += 3;
-
-                // 专业技能
-                currentY = drawSectionTitle('专业技能', currentY);
-                ctx.font = 'bold ' + px(3) + 'px "Microsoft YaHei", sans-serif';
-                ctx.fillStyle = '#888888';
-                ctx.fillText('设计工具', px(margin), px(currentY));
-                ctx.fillText('核心能力', px(margin + 85), px(currentY));
-                currentY += 5;
-                ctx.font = px(3.2) + 'px "Microsoft YaHei", sans-serif';
-                ctx.fillStyle = '#444444';
-                ctx.fillText('AutoCAD、SketchUp、InDesign', px(margin), px(currentY));
-                ctx.fillText('场地规划分析、概念方案设计', px(margin + 85), px(currentY));
-                currentY += 5;
-                ctx.fillText('Photoshop、D5、WPS', px(margin), px(currentY));
-                ctx.fillText('方案深化设计、项目汇报沟通', px(margin + 85), px(currentY));
-                currentY += 5;
-                ctx.fillText('', px(margin), px(currentY));
-                ctx.fillText('Ipad绘图、AI辅助设计', px(margin + 85), px(currentY));
-
-                currentY += 8;
-
-                // 工作经历
-                currentY = drawSectionTitle('工作经历', currentY);
-
-                const experiences = [
-                    { company: '杭州壹合景观设计有限公司', time: '2022.5 — 至今', title: '主创设计师', duties: ['项目前期的沟通与分析', '项目从概念到落地的全程设计与把控', '项目沟通汇报', '项目施工落地跟进与沟通'] },
-                    { company: '浙江绿城环境工程咨询管理有限公司', time: '2018.5 — 2022.5', title: '资深景观设计师', duties: [] },
-                    { company: '中国美院设计研究院设计师工作室', time: '2016.4 — 2018.5', title: '景观设计师', duties: ['主要负责美丽乡村景观设计工作', '完成从方案设计、建模效果图、文本制作全过程'] },
-                    { company: '杭州绿风景观设计研究院', time: '2015.7 — 2016.4', title: '景观设计师助理', duties: ['负责辅助设计师制作文本、建模、效果图制作', '工作表现优良，获得主创设计师认可'] }
-                ];
-
-                experiences.forEach(exp => {
-                    ctx.font = 'bold ' + px(3.5) + 'px "Microsoft YaHei", sans-serif';
-                    ctx.fillStyle = '#1d1d1f';
-                    ctx.fillText(exp.company, px(margin), px(currentY));
-                    ctx.font = px(3) + 'px "Microsoft YaHei", sans-serif';
-                    ctx.fillStyle = '#888888';
-                    ctx.textAlign = 'right';
-                    ctx.fillText(exp.time, px(pageWidth - margin), px(currentY));
-                    ctx.textAlign = 'left';
-                    currentY += 5;
-                    ctx.fillText(exp.title, px(margin), px(currentY));
-                    currentY += 5;
-
-                    exp.duties.forEach(duty => {
-                        ctx.fillStyle = '#444444';
-                        ctx.fillText('• ' + duty, px(margin + 3), px(currentY));
-                        currentY += 5;
-                    });
-                    currentY += 3;
+                // 1. 强制显示所有因动画而隐藏的元素（scroll动画默认opacity:0）
+                document.querySelectorAll('.animate-on-scroll, .animate-slide-left, .animate-slide-right, .animate-scale, .animate-title').forEach(el => {
+                    el.classList.add('visible');
                 });
 
-                // 代表项目
-                currentY = drawSectionTitle('代表项目', currentY);
-                currentY = drawParagraph('扬州中和绿城春江明月、海盐蓝城春风如意、嘉兴秀璟湾、嘉兴世合理想大地、杭州西溪印、台州创融润园、台州凤语和鸣、柳州杨柳郡棕榈苑、安徽巢湖犇山壹品、柳州B31地块', currentY);
+                // 2. 临时隐藏固定导航栏（否则会在每页顶部重复出现）
+                navbar.style.visibility = 'hidden';
 
-                currentY += 3;
+                // 3. 滚动到页面顶部
+                const originalScrollY = window.scrollY;
+                window.scrollTo(0, 0);
 
-                // 荣誉证书
-                currentY = drawSectionTitle('荣誉证书', currentY);
-                currentY = drawParagraph('中级工程师、2019年蓝城集团优秀员工奖、嘉兴南北湖蓝城春风如意里项目荣获GHDA金奖', currentY);
+                // 等待渲染完成
+                await new Promise(resolve => setTimeout(resolve, 400));
 
-                // 将canvas转为图片添加到PDF
-                const imgData = canvas.toDataURL('image/jpeg', 1.0);
-                doc.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
+                // 4. 用html2canvas将整个网页截图（包含所有图片和设计）
+                const canvas = await html2canvas(document.body, {
+                    scale: 1.5,              // 1.5倍分辨率，清晰度与文件大小的平衡点
+                    useCORS: true,           // 允许跨域图片
+                    allowTaint: true,        // 允许图片污染canvas
+                    scrollX: 0,
+                    scrollY: 0,
+                    width: window.innerWidth,
+                    height: document.body.scrollHeight,
+                    windowWidth: window.innerWidth,
+                    windowHeight: document.body.scrollHeight,
+                    logging: false,
+                    backgroundColor: '#0a0a0a'  // 匹配页面背景色
+                });
 
-                // 添加可点击的网址链接（位置对应"在线简历"文字区域）
-                doc.link(50, 33, 110, 6, { url: 'https://nppdxqc1992-coder.github.io/portfolio/' });
+                // 5. 将截图分割成A4页面并生成PDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
 
-                // 下载PDF
-                doc.save('陈丹霞_景观设计师_简历.pdf');
+                const pdfWidth = 210;   // A4宽度(mm)
+                const pdfHeight = 297;  // A4高度(mm)
+
+                // 计算图片在PDF中的实际高度（保持宽高比）
+                const imgData = canvas.toDataURL('image/jpeg', 0.88);
+                const imgWidth = pdfWidth;
+                const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+                // 逐页写入（每次偏移一个A4页面的高度）
+                let heightLeft = imgHeight;
+                let yPos = 0;
+
+                pdf.addImage(imgData, 'JPEG', 0, yPos, imgWidth, imgHeight);
+                heightLeft -= pdfHeight;
+
+                while (heightLeft > 0) {
+                    yPos -= pdfHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', 0, yPos, imgWidth, imgHeight);
+                    heightLeft -= pdfHeight;
+                }
+
+                // 6. 下载PDF
+                pdf.save('陈丹霞_景观设计师_作品集.pdf');
+
+                // 7. 恢复页面状态
+                navbar.style.visibility = '';
+                window.scrollTo(0, originalScrollY);
 
             } catch (error) {
-                console.error('PDF生成失败:', error);
-                alert('PDF生成失败，请稍后重试');
+                console.error('作品集PDF生成失败:', error);
+                alert('作品集PDF生成失败，请稍后重试');
+                if (navbar) navbar.style.visibility = '';
             }
 
             // 恢复按钮状态
