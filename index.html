@@ -605,6 +605,10 @@
                         <p style="color:#2997ff;font-size:12px;margin:0;">nppdxqc1992-coder.github.io/portfolio</p>
                     </div>`, true);
 
+                // 封面URL叠加可点击区域（在图片上方叠加透明链接，坐标单位mm）
+                // 封面内容垂直居中，URL文字约在页面191mm处，水平居中
+                pdf.link(55, 188, 100, 10, { url: 'https://nppdxqc1992-coder.github.io/portfolio/' });
+
                 btn.innerHTML = spinner + ' 生成简介页...';
 
                 // ── 个人简介页 ───────────────────────────────────────
