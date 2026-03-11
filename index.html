@@ -601,13 +601,16 @@
                         <img src="images/portrait.jpg" style="width:160px;height:160px;object-fit:cover;border-radius:50%;margin-bottom:36px;" onerror="this.style.display='none'" />
                         <h1 style="color:#fff;font-size:54px;font-weight:600;margin:0 0 16px;letter-spacing:6px;">陈丹霞</h1>
                         <p style="color:#aaa;font-size:18px;margin:0 0 12px;letter-spacing:2px;">景观设计师 &nbsp;|&nbsp; 11年经验 &nbsp;|&nbsp; 杭州</p>
-                        <p style="color:#666;font-size:13px;margin:0 0 10px;">159 8821 2696 &nbsp;·&nbsp; 1067943503@qq.com</p>
-                        <p style="color:#2997ff;font-size:12px;margin:0;">nppdxqc1992-coder.github.io/portfolio</p>
+                        <p style="color:#666;font-size:13px;margin:0 0 22px;">159 8821 2696 &nbsp;·&nbsp; 1067943503@qq.com</p>
+                        <p style="color:#555;font-size:11px;margin:0 0 7px;letter-spacing:2px;">完整作品集请点击</p>
+                        <p style="color:#2997ff;font-size:12px;margin:0;display:inline-flex;align-items:center;gap:5px;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2997ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                            nppdxqc1992-coder.github.io/portfolio
+                        </p>
                     </div>`, true);
 
-                // 封面URL叠加可点击区域（在图片上方叠加透明链接，坐标单位mm）
-                // 封面内容垂直居中，URL文字约在页面191mm处，水平居中
-                pdf.link(55, 188, 100, 10, { url: 'https://nppdxqc1992-coder.github.io/portfolio/' });
+                // 封面URL叠加可点击区域（坐标单位mm，覆盖"完整作品集请点击"和网址两行）
+                pdf.link(50, 191, 110, 14, { url: 'https://nppdxqc1992-coder.github.io/portfolio/' });
 
                 btn.innerHTML = spinner + ' 生成简介页...';
 
