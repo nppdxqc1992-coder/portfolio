@@ -511,10 +511,10 @@
         </div>
     </footer>
 
-    <!-- html2canvas库 - 将网页截图为canvas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- html2canvas库 - 将网页截图为canvas（用 unpkg CDN，国内较稳定） -->
+    <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <!-- jsPDF库 - 将canvas转为PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
     <!-- 下载作品集功能 - 每页2张图，保持图片原始比例，不变形不裁切 -->
     <script>
@@ -586,6 +586,14 @@
                 pdf.addImage(canvas.toDataURL('image/jpeg', 0.88), 'JPEG', 0, 0, 210, 297);
             }
 
+            // 检查库是否加载完毕
+            if (!window.jspdf || !window.html2canvas) {
+                alert('PDF生成库尚未加载完毕，请稍等几秒后重试，\n或检查网络是否正常。');
+                btn.classList.remove('downloading');
+                btn.innerHTML = originalHTML;
+                return;
+            }
+
             try {
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
@@ -595,10 +603,14 @@
                 const IMG_MAX_H = 450;     // 单张图片最大高度（保证2张能竖排）
                 const fontStack = `'Noto Sans SC', 'Microsoft YaHei', sans-serif`;
 
-                // ── 封面页 ──────────────────────────────────────────
+                // ── 封面页（头像预加载为 data URL，避免 html2canvas CORS 卡住）───
+                const portraitResult = await loadAndFitImage('images/portrait.jpg', 160, 160);
+                const portraitHTML = portraitResult
+                    ? `<img src="${portraitResult.data}" style="width:160px;height:160px;object-fit:cover;border-radius:50%;margin-bottom:36px;" />`
+                    : '';
                 await capturePage(pdf, `
                     <div style="width:${W}px;height:${H}px;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:${fontStack};box-sizing:border-box;">
-                        <img src="images/portrait.jpg" style="width:160px;height:160px;object-fit:cover;border-radius:50%;margin-bottom:36px;" onerror="this.style.display='none'" />
+                        ${portraitHTML}
                         <h1 style="color:#fff;font-size:54px;font-weight:600;margin:0 0 16px;letter-spacing:6px;">陈丹霞</h1>
                         <p style="color:#aaa;font-size:18px;margin:0 0 12px;letter-spacing:2px;">景观设计师 &nbsp;|&nbsp; 11年经验 &nbsp;|&nbsp; 杭州</p>
                         <p style="color:#666;font-size:13px;margin:0 0 22px;">159 8821 2696 &nbsp;·&nbsp; 1067943503@qq.com</p>
