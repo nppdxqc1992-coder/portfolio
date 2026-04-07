@@ -550,6 +550,182 @@ body {
 }
 
 /* ============================================
+   AI 工作流实践 Section
+   ============================================ */
+.section-ai-workflow {
+    background: var(--bg-primary); /* 黑色背景，与Hero呼应 */
+}
+
+.section-ai-workflow .section-label {
+    text-align: center;
+    color: rgba(255,255,255,0.3);
+}
+
+.section-ai-workflow .section-title {
+    text-align: center;
+    color: #fff;
+}
+
+/* 副介绍语 */
+.ai-workflow-intro {
+    text-align: center;
+    font-size: 1rem;
+    color: rgba(255,255,255,0.45);
+    margin-top: -16px;
+    margin-bottom: 72px;
+    letter-spacing: 0.02em;
+}
+
+/* 单个Demo区块 */
+.ai-demo-block {
+    margin-bottom: 80px;
+}
+
+.ai-demo-header {
+    margin-bottom: 32px;
+}
+
+/* 小标签 "工作流 Demo · 01" */
+.ai-demo-tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 12px;
+}
+
+.ai-demo-title {
+    font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+}
+
+.ai-demo-desc {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.7;
+}
+
+/* 视频展示：全宽，圆角，自动播放 */
+.ai-demo-video-wrap {
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    background: #111;
+}
+
+.ai-demo-video {
+    width: 100%;
+    display: block;
+    max-height: 520px;
+    object-fit: cover;
+}
+
+/* 图片画廊：3列网格 */
+.ai-demo-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.ai-demo-gallery img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    border-radius: 10px;
+    display: block;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.ai-demo-gallery img:hover {
+    opacity: 0.85;
+    transform: scale(1.02);
+}
+
+/* 截图画廊：两栏等宽，带阴影质感 */
+.ai-demo-gallery--screenshots {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.ai-demo-gallery--screenshots img {
+    aspect-ratio: 16/10;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* 探索中标签 */
+.ai-demo-exploring {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: #f5a623;
+    background: rgba(245,166,35,0.12);
+    border: 1px solid rgba(245,166,35,0.3);
+    border-radius: 100px;
+    padding: 2px 10px;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+/* 单图全宽展示 */
+.ai-demo-single img {
+    width: 100%;
+    display: block;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* 点睛哲学句 */
+.ai-philosophy {
+    margin-top: 72px;
+    padding-top: 48px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+}
+
+.ai-philosophy-main {
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 14px;
+    letter-spacing: -0.01em;
+}
+
+.ai-philosophy-sub {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.02em;
+}
+
+/* 响应式 */
+@media (max-width: 900px) {
+    .ai-demo-gallery {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .ai-demo-gallery,
+    .ai-demo-gallery--screenshots {
+        grid-template-columns: 1fr;
+    }
+    .ai-demo-video {
+        max-height: 260px;
+    }
+}
+
+/* ============================================
    项目作品
    ============================================ */
 .section-projects {
@@ -800,8 +976,9 @@ a.project-card .project-desc {
 .job-title {
     font-size: 1rem;
     color: var(--gray);
-    margin-bottom: 20px;
+    margin-bottom: 12px;
 }
+
 
 .job-duties {
     list-style: none;
